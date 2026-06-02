@@ -31,7 +31,7 @@ In Xcode:
 2. Enter the repository URL:
 
 ```text
-https://github.com/YOUR_USERNAME/SKRoute.git
+https://github.com/sujeetshrivastav-ss/SKRoute.git
 ```
 
 3. Select the latest version.
@@ -41,8 +41,8 @@ Or add directly in Package.swift:
 ```swift
 dependencies: [
     .package(
-        url: "https://github.com/YOUR_USERNAME/SKRoute.git",
-        from: "1.0.0"
+        url: "https://github.com/sujeetshrivastav-ss/SKRoute.git",
+        from: "1.2.0"
     )
 ]
 ```
