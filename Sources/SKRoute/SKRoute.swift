@@ -5,34 +5,50 @@ import Foundation
 
 public enum SKRoute {
 
-    /// Returns cached network info if available
-    public static func networkInfo() async -> NetworkInfo? {
-        await WiFiInfoProvider.shared.currentNetwork()
-    }
+    // MARK: WiFi
 
-    /// Forces refresh from system APIs
-    public static func refresh() async -> NetworkInfo? {
-        await WiFiInfoProvider.shared.refresh()
-    }
+       public static func networkInfo() async -> NetworkInfo? {
+           await WiFiInfoProvider.shared
+               .networkInfo()
+       }
 
-    public static func ssid() async -> String? {
-        await networkInfo()?.ssid
-    }
+       public static func refresh() async -> NetworkInfo? {
+           await WiFiInfoProvider.shared
+               .refresh()
+       }
 
-    public static func bssid() async -> String? {
-        await networkInfo()?.bssid
-    }
+       public static func ssid() async -> String? {
+           await networkInfo()?.ssid
+       }
 
-    public static func ssidData() async -> Data? {
-        await networkInfo()?.ssidData
-    }
-    
-    // MARK: - IP Address Provider
-    public static func ipAddress() -> String? {
-        IPAddressProvider.ipAddress()
-    }
+       public static func bssid() async -> String? {
+           await networkInfo()?.bssid
+       }
 
-    public static func isWiFiConnected() -> Bool {
-        ipAddress() != nil
-    }
+       public static func ssidData() async -> Data? {
+           await networkInfo()?.ssidData
+       }
+
+       // MARK: Interface
+       public static func ipAddress() -> String? {
+           InterfaceProvider
+               .currentInterface()
+               .ipAddress
+       }
+
+       public static func netmask() -> String? {
+           InterfaceProvider
+               .currentInterface()
+               .netmask
+       }
+
+       public static func destination() -> String? {
+           InterfaceProvider
+               .currentInterface()
+               .destination
+       }
+
+       public static func isWiFiConnected() -> Bool {
+           ipAddress() != nil
+       }
 }
