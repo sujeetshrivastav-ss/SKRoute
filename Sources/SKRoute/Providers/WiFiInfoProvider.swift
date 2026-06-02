@@ -28,6 +28,15 @@ actor WiFiInfoProvider {
 
         return await refresh()
     }
+    
+    func networkInfo() async -> NetworkInfo? {
+        
+        if let cachedInfo {
+            return cachedInfo
+        }
+        
+        return await refresh()
+    }
 
     func refresh() async -> NetworkInfo? {
 
