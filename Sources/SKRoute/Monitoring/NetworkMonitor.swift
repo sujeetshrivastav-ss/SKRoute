@@ -9,19 +9,26 @@
 import Foundation
 import Network
 
-public final class NetworkMonitor {
+public actor NetworkMonitor {
 
     private let monitor = NWPathMonitor()
 
     public init() {}
 
-    public func startMonitoring(
-        handler: @escaping @Sendable (NWPath.Status) -> Void
-    ) {
-        monitor.pathUpdateHandler = { path in
-            handler(path.status)
-        }
+    public func statuses()
+    -> AsyncStream<NWPath.Status> {
 
-        monitor.start(queue: .global())
+        AsyncStream { continuation in
+
+            monitor.pathUpdateHandler = { path in
+                continuation.yield(path.status)
+            }
+
+            monitor.start(queue: .global())
+        }
+    }
+
+    public func stop() {
+        monitor.cancel()
     }
 }
