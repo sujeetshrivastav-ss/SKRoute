@@ -12,10 +12,20 @@ All notable changes to this project will be documented in this file.
 ## [1.0.0] - 2026-06-02
 
 ### Added
-- Initial Swift Package Manager support
-- Async/Await API
-- WiFi SSID retrieval
-- WiFi BSSID retrieval
-- NetworkInfo model
-- Actor-based caching
-- Unit tests
+
+* Swift Package Manager support
+* Async/Await APIs
+* Swift Concurrency support
+* Actor-based thread-safe caching
+* WiFi SSID retrieval
+* WiFi BSSID retrieval
+* NetworkInfo model
+* Unit test target
+* GitHub release support
+
+### Requirements
+
+* iOS 14+
+* Swift 6+
+* Xcode 16+
+
