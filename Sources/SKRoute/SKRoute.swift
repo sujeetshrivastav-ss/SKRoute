@@ -26,4 +26,13 @@ public enum SKRoute {
     public static func ssidData() async -> Data? {
         await networkInfo()?.ssidData
     }
+    
+    // MARK: - IP Address Provider
+    public static func ipAddress() -> String? {
+        IPAddressProvider.ipAddress()
+    }
+
+    public static func isWiFiConnected() -> Bool {
+        ipAddress() != nil
+    }
 }
