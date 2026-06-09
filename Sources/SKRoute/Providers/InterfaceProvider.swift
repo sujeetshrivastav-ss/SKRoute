@@ -10,68 +10,77 @@ import Foundation
 
 enum InterfaceProvider {
 
+    // MARK: - Public
+
     static func currentInterface() -> NetworkInterfaceInfo {
 
         var ipAddress: String?
-        var netmask: String?
+        var subnetMask: String?
         var destination: String?
 
-        var ifaddr: UnsafeMutablePointer<ifaddrs>?
+        var interfaces: UnsafeMutablePointer<ifaddrs>?
 
-        guard getifaddrs(&ifaddr) == 0 else {
+        guard getifaddrs(&interfaces) == 0 else {
             return NetworkInterfaceInfo(
                 ipAddress: nil,
-                netmask: nil,
+                subnetMask: nil,
                 destination: nil
             )
         }
 
         defer {
-            freeifaddrs(ifaddr)
+            freeifaddrs(interfaces)
         }
 
-        var ptr = ifaddr
+        var pointer = interfaces
 
-        while ptr != nil {
+        while let interface = pointer?.pointee {
 
-            let interface = ptr!.pointee
+            guard let address = interface.ifa_addr else {
+                pointer = interface.ifa_next
+                continue
+            }
 
-            let family =
-                interface.ifa_addr.pointee.sa_family
+            let family = address.pointee.sa_family
 
             if family == UInt8(AF_INET) {
 
-                let name =
-                    String(cString: interface.ifa_name)
+                let interfaceName = String(
+                    cString: interface.ifa_name
+                )
 
-                if name == "en0" {
+                if interfaceName == "en0" {
 
                     ipAddress = stringValue(
-                        interface.ifa_addr
+                        from: interface.ifa_addr
                     )
 
-                    netmask = stringValue(
-                        interface.ifa_netmask
+                    subnetMask = stringValue(
+                        from: interface.ifa_netmask
                     )
 
                     destination = stringValue(
-                        interface.ifa_dstaddr
+                        from: interface.ifa_dstaddr
                     )
+
+                    break
                 }
             }
 
-            ptr = interface.ifa_next
+            pointer = interface.ifa_next
         }
 
         return NetworkInterfaceInfo(
             ipAddress: ipAddress,
-            netmask: netmask,
+            subnetMask: subnetMask,
             destination: destination
         )
     }
 
+    // MARK: - Private
+
     private static func stringValue(
-        _ address: UnsafeMutablePointer<sockaddr>?
+        from address: UnsafeMutablePointer<sockaddr>?
     ) -> String? {
 
         guard let address else {
@@ -93,6 +102,15 @@ enum InterfaceProvider {
             NI_NUMERICHOST
         )
 
-        return String(cString: host)
+        let length = host.firstIndex(of: 0) ?? host.count
+
+        let bytes = host
+            .prefix(length)
+            .map { UInt8(bitPattern: $0) }
+
+        return String(
+            decoding: bytes,
+            as: UTF8.self
+        )
     }
 }
