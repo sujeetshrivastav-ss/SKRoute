@@ -7,39 +7,133 @@
 
 # Changelog
 
-## [1.1.0] - 2026-06-02
+All notable changes to this project will be documented in this file.
+
+## [1.3.0] - 2026-06-09
 
 ### Added
 
-- Swift Package Manager support
-- Swift 6 compatibility
-- Async/Await APIs
-- Actor-based thread-safe architecture
-- SSID retrieval
-- BSSID retrieval
-- SSID Data retrieval
-- NetworkInfo model
-- Local IP address retrieval
-- Netmask retrieval
-- Destination address retrieval
-- WiFi connection detection
-- Network monitoring with AsyncStream support
-- Unit tests
+#### Cellular Information
+
+* Cellular access technology retrieval
+* Cellular service identifier retrieval
+* Cellular IP address retrieval
+* Cellular subnet mask retrieval
+* CellularInfo model
+* CellularInterfaceInfo model
+
+#### Supported Technologies
+
+* LTE
+* 5G NSA
+* 5G SA
+* Dual SIM devices
+* eSIM devices
+
+#### New APIs
+
+```swift
+SKRoute.cellularInfo()
+
+SKRoute.cellularAccessTechnology()
+
+SKRoute.cellularServiceIdentifier()
+
+SKRoute.cellularIPAddress()
+
+SKRoute.cellularSubnetMask()
+```
+
+### Improvements
+
+* Enhanced network information coverage
+* Additional examples and documentation
+* Expanded test coverage
+
+---
+
+## [1.2.0] - 2026-06-02
+
+### Added
+
+#### Network Interface Information
+
+* Local IP address retrieval
+* Netmask retrieval
+* Destination address retrieval
+* WiFi connectivity detection
+
+#### Network Monitoring
+
+* NWPathMonitor integration
+* AsyncStream support
+* Real-time network status updates
+
+#### New Models
+
+* NetworkInterfaceInfo
+
+#### New APIs
+
+```swift
+SKRoute.ipAddress()
+
+SKRoute.netmask()
+
+SKRoute.destination()
+
+SKRoute.isWiFiConnected()
+```
+
+### Improvements
+
+* Improved package structure
+* Additional documentation
+* Additional usage examples
+* Expanded test coverage
+
+---
+
+## [1.0.0] - 2026-06-02
+
+### Added
+
+#### Swift Package Manager
+
+* Swift Package Manager support
+* Modular package structure
+
+#### Swift Concurrency
+
+* Async/Await APIs
+* Actor-based thread safety
+* Swift 6 compatibility
+
+#### WiFi Information
+
+* SSID retrieval
+* BSSID retrieval
+* SSID Data retrieval
+* NetworkInfo model
+* Cached WiFi information
+
+#### New APIs
+
+```swift
+await SKRoute.ssid()
+
+await SKRoute.bssid()
+
+await SKRoute.ssidData()
+
+await SKRoute.networkInfo()
+
+await SKRoute.refresh()
+```
 
 ### Changed
 
-- Replaced CNCopyCurrentNetworkInfo with NEHotspotNetwork.fetchCurrent
-- Replaced synchronous APIs with async/await APIs
-- Modernized package structure
-
-### Not Yet Included
-
-- Gateway IP retrieval
-- IPv6 support
-- Complete network model
-
-### Requirements
-
-* iOS 14+
-* Swift 6+
-* Xcode 16+
+* Migrated from Objective-C to Swift
+* Replaced CNCopyCurrentNetworkInfo with NEHotspotNetwork.fetchCurrent
+* Replaced synchronous APIs with async/await APIs
+* Modernized project structure
