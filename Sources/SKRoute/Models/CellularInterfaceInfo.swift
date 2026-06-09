@@ -17,12 +17,17 @@ public struct CellularInterfaceInfo: Sendable {
     /// Cellular interface subnet mask.
     public let subnetMask: String?
 
+    /// Indicates whether a cellular interface was detected.
+    public let isAvailable: Bool
+
     public init(
         ipAddress: String?,
-        subnetMask: String?
+        subnetMask: String?,
+        isAvailable: Bool
     ) {
         self.ipAddress = ipAddress
         self.subnetMask = subnetMask
+        self.isAvailable = isAvailable
     }
 }
 

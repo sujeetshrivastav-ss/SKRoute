@@ -13,42 +13,31 @@ actor WiFiInfoProvider {
 
     static let shared = WiFiInfoProvider()
 
-    private var cachedInfo: NetworkInfo?
-    private var lastRefresh: Date?
+    private var cache: WiFiInfo?
 
-    private let cacheDuration: TimeInterval = 30
+    // MARK: - Public
 
-    func currentNetwork() async -> NetworkInfo? {
+    func wifiInfo() async -> WiFiInfo? {
 
-        if let cachedInfo,
-           let lastRefresh,
-           Date().timeIntervalSince(lastRefresh) < cacheDuration {
-            return cachedInfo
+        if let cache {
+            return cache
         }
 
         return await refresh()
     }
-    
-    func networkInfo() async -> NetworkInfo? {
-        
-        if let cachedInfo {
-            return cachedInfo
-        }
-        
-        return await refresh()
+
+    func refresh() async -> WiFiInfo? {
+
+        let info = await fetchCurrent()
+
+        cache = info
+
+        return info
     }
 
-    func refresh() async -> NetworkInfo? {
+    // MARK: - Private
 
-        let networkInfo = await fetchCurrentNetwork()
-
-        cachedInfo = networkInfo
-        lastRefresh = Date()
-
-        return networkInfo
-    }
-
-    private func fetchCurrentNetwork() async -> NetworkInfo? {
+    private func fetchCurrent() async -> WiFiInfo? {
 
         await withCheckedContinuation { continuation in
 
@@ -59,13 +48,13 @@ actor WiFiInfoProvider {
                     return
                 }
 
-                let info = NetworkInfo(
-                    ssid: network.ssid,
-                    bssid: network.bssid,
-                    ssidData: network.ssid.data(using: .utf8)
+                continuation.resume(
+                    returning: WiFiInfo(
+                        ssid: network.ssid,
+                        bssid: network.bssid,
+                        ssidData: network.ssid.data(using: .utf8)
+                    )
                 )
-
-                continuation.resume(returning: info)
             }
         }
     }

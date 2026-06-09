@@ -1,17 +1,54 @@
 # SKRoute
 
-Modern WiFi Information Framework for iOS built with Swift Concurrency and Swift Package Manager.
+A modern Swift Package for retrieving WiFi, Cellular and Network Interface information using Swift Concurrency.
 
 ## Features
 
-* Async/Await API
+### WiFi Information
+
+* SSID
+* BSSID
+* SSID Data
+* Cached WiFi Information
+
+### Network Interface Information
+
+* IP Address
+* Subnet Mask
+* Destination Address
+* WiFi Connectivity Detection
+
+### Cellular Information
+
+* Cellular Availability Detection
+* Active Cellular Data Detection
+* Cellular IP Address
+* Cellular Subnet Mask
+* Network Generation (2G / 3G / 4G / 5G)
+* Service Identifier
+
+### Active Network Detection
+
+* WiFi
+* Cellular
+* Ethernet
+* Unknown
+* None
+
+### Network Monitoring
+
+* NWPathMonitor Integration
+* AsyncStream Support
+* Real-Time Status Updates
+
+### Modern Architecture
+
+* Swift Package Manager
+* Swift Concurrency
+* Actor-Based WiFi Provider
+* Sendable Models
 * Swift 6 Compatible
-* Actor-based thread safety
-* WiFi SSID retrieval
-* WiFi BSSID retrieval
-* Cached network information
-* Swift Package Manager support
-* iOS 14+
+* No Deprecated APIs
 
 ## Requirements
 
@@ -23,187 +60,161 @@ Modern WiFi Information Framework for iOS built with Swift Concurrency and Swift
 
 ## Installation
 
-### Swift Package Manager
-
-In Xcode:
-
-1. File → Add Package Dependencies
-2. Enter the repository URL:
-
-```text
-https://github.com/sujeetshrivastav-ss/SKRoute.git
-```
-
-3. Select the latest version.
-
-Or add directly in Package.swift:
-
 ```swift
 dependencies: [
     .package(
         url: "https://github.com/sujeetshrivastav-ss/SKRoute.git",
-        from: "1.2.0"
+        from: "2.0.0"
     )
 ]
 ```
 
-## Required Capabilities
-
-Apple requires access permissions before WiFi information can be retrieved.
-
-### Info.plist
-
-```xml
-<key>NSLocationWhenInUseUsageDescription</key>
-<string>Location access is required to retrieve WiFi information.</string>
-```
-
-### Capabilities
-
-Enable:
-
-* Access WiFi Information
-
-### Notes
-
-NEHotspotNetwork.fetchCurrent() may return nil when:
-
-* Location permission has not been granted
-* WiFi Information capability is not enabled
-* Device is not connected to WiFi
-* Running on Simulator
-
 ## Usage
 
-### Get Current SSID
+### WiFi Information
 
 ```swift
-import SKRoute
+let wifi = await SKRoute.wifiInfo()
 
-Task {
-    let ssid = await SKRoute.ssid()
-    print(ssid ?? "No WiFi")
-}
+print(wifi?.ssid ?? "")
+print(wifi?.bssid ?? "")
 ```
 
-### Get Current BSSID
+### Network Interface Information
 
 ```swift
-import SKRoute
+let interface = SKRoute.networkInterfaceInfo()
 
-Task {
-    let bssid = await SKRoute.bssid()
-    print(bssid ?? "No BSSID")
-}
+print(interface.ipAddress ?? "")
+print(interface.subnetMask ?? "")
+print(interface.destination ?? "")
 ```
 
-### Get Complete Network Information
+### Cellular Information
 
 ```swift
-import SKRoute
+let cellular = SKRoute.cellularInfo()
 
-Task {
-    if let network = await SKRoute.networkInfo() {
-        print("SSID:", network.ssid ?? "")
-        print("BSSID:", network.bssid ?? "")
-    }
-}
+print(cellular.generation.rawValue)
+print(cellular.ipAddress ?? "")
+print(cellular.subnetMask ?? "")
 ```
 
-### Force Refresh
+### Cellular Availability
 
 ```swift
-import SKRoute
+let available =
+    SKRoute.isCellularAvailable()
 
-Task {
-    let refreshedNetwork = await SKRoute.refresh()
-
-    print(refreshedNetwork?.ssid ?? "")
-}
+let active =
+    SKRoute.hasActiveCellularData()
 ```
 
-## Cellular Information
-
-Retrieve information about the active cellular connection.
-
-### Usage
+### Active Network
 
 ```swift
-import SKRoute
+let network =
+    await SKRoute.activeNetworkInfo()
 
-let cellularInfo = SKRoute.cellularInfo()
-
-print(cellularInfo.accessTechnology ?? "")
-print(cellularInfo.serviceIdentifier ?? "")
-print(cellularInfo.ipAddress ?? "")
-print(cellularInfo.subnetMask ?? "")
+print(network.networkType)
 ```
 
-### Individual APIs
+### Complete Network Information
 
 ```swift
-SKRoute.cellularAccessTechnology()
+let networkInfo =
+    await SKRoute.completeNetworkInfo()
 
-SKRoute.cellularServiceIdentifier()
+print(networkInfo.activeNetwork.networkType)
 
-SKRoute.cellularIPAddress()
+print(networkInfo.wifi?.ssid ?? "")
 
-SKRoute.cellularSubnetMask()
+print(networkInfo.interface?.ipAddress ?? "")
 ```
 
-### Supported Technologies
-
-* LTE
-* 5G NSA
-* 5G SA
-* Dual SIM
-* eSIM
-
-## Example
+### Network Monitoring
 
 ```swift
-import SwiftUI
-import SKRoute
+let monitor = NetworkMonitor()
 
-struct ContentView: View {
+for await status in await monitor.statuses() {
 
-    @State private var ssid: String = "Loading..."
-
-    var body: some View {
-        Text(ssid)
-            .task {
-                ssid = await SKRoute.ssid() ?? "Unknown Network"
-            }
-    }
+    print(status)
 }
 ```
 
 ## Architecture
 
 ```text
-Application
-      │
-      ▼
-   SKRoute
-      │
-      ▼
-WiFiInfoProvider (Actor)
-      │
-      ▼
-NEHotspotNetwork
-      │
-      ▼
-NetworkInfo
+SKRoute
+│
+├── WiFiInfoProvider (Actor)
+│   └── NEHotspotNetwork
+│
+├── InterfaceProvider
+│   └── getifaddrs()
+│
+├── CellularInfoProvider
+│   ├── CoreTelephony
+│   └── CellularInterfaceProvider
+│
+├── ActiveNetworkProvider
+│   └── NWPathMonitor
+│
+└── NetworkMonitor
+    └── AsyncStream<NWPath.Status>
 ```
 
-## Contributing
+## Models
 
-Contributions are welcome.
+### WiFiInfo
 
-1. Fork the repository
-2. Create a feature branch
-3. Commit changes
-4. Open a Pull Request
+```swift
+WiFiInfo
+```
+
+### CellularInfo
+
+```swift
+CellularInfo
+```
+
+### NetworkInterfaceInfo
+
+```swift
+NetworkInterfaceInfo
+```
+
+### ActiveNetworkInfo
+
+```swift
+ActiveNetworkInfo
+```
+
+### CompleteNetworkInfo
+
+```swift
+CompleteNetworkInfo
+```
+
+## Notes
+
+### WiFi APIs
+
+May return nil when:
+
+* Running on Simulator
+* Not connected to WiFi
+* Location permission denied
+* Access WiFi Information capability not enabled
+
+### Cellular APIs
+
+Availability depends on:
+
+* Device hardware
+* SIM/eSIM availability
+* Active cellular service
 
 ## License
 

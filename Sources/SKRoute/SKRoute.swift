@@ -3,78 +3,112 @@
 
 import Foundation
 
+    /// Main entry point for retrieving network information.
 public enum SKRoute {
     
-    // MARK: WiFi
+    // MARK: - WiFi
     
-    public static func networkInfo() async -> NetworkInfo? {
-        await WiFiInfoProvider.shared
-            .networkInfo()
+    /// Returns current WiFi information.
+    public static func wifiInfo() async -> WiFiInfo? {
+        await WiFiInfoProvider.shared.wifiInfo()
     }
     
-    public static func refresh() async -> NetworkInfo? {
-        await WiFiInfoProvider.shared
-            .refresh()
+    /// Refreshes and returns current WiFi information.
+    public static func refreshWiFiInfo() async -> WiFiInfo? {
+        await WiFiInfoProvider.shared.refresh()
     }
     
+    /// Returns current WiFi SSID.
     public static func ssid() async -> String? {
-        await networkInfo()?.ssid
+        await wifiInfo()?.ssid
     }
     
+    /// Returns current WiFi BSSID.
     public static func bssid() async -> String? {
-        await networkInfo()?.bssid
+        await wifiInfo()?.bssid
     }
     
+    /// Returns current WiFi SSID data.
     public static func ssidData() async -> Data? {
-        await networkInfo()?.ssidData
+        await wifiInfo()?.ssidData
     }
     
-    // MARK: - Wifi
+    // MARK: - Network Interface
+    
+    /// Returns current network interface information.
+    public static func networkInterfaceInfo() -> NetworkInterfaceInfo {
+        InterfaceProvider.currentInterface()
+    }
+    
+    /// Returns current IP address.
     public static func ipAddress() -> String? {
-        InterfaceProvider
-            .currentInterface()
-            .ipAddress
+        networkInterfaceInfo().ipAddress
     }
     
-    public static func netmask() -> String? {
-        InterfaceProvider
-            .currentInterface()
-            .netmask
+    /// Returns current subnet mask.
+    public static func subnetMask() -> String? {
+        networkInterfaceInfo().subnetMask
     }
     
+    /// Returns current destination address.
     public static func destination() -> String? {
-        InterfaceProvider
-            .currentInterface()
-            .destination
+        networkInterfaceInfo().destination
     }
     
+    /// Returns true when WiFi interface is available.
     public static func isWiFiConnected() -> Bool {
         ipAddress() != nil
     }
     
     // MARK: - Cellular
-    /// Returns current cellular network information.
+    
+    /// Returns current cellular information.
     public static func cellularInfo() -> CellularInfo {
         CellularInfoProvider.cellularInfo()
     }
     
-    /// Returns current cellular access technology.
-    public static func cellularAccessTechnology() -> String? {
-        cellularInfo().accessTechnology
+    /// Returns true if a cellular interface exists.
+    public static func isCellularAvailable() -> Bool {
+        CellularInterfaceProvider.isCellularAvailable()
     }
     
-    /// Returns current cellular service identifier.
-    public static func cellularServiceIdentifier() -> String? {
-        cellularInfo().serviceIdentifier
+    /// Returns true if cellular data service is active.
+    public static func hasActiveCellularData() -> Bool {
+        CellularInfoProvider.hasActiveDataService()
     }
     
-    /// Returns current cellular IP address.
-    public static func cellularIPAddress() -> String? {
-        cellularInfo().ipAddress
+    // MARK: - Active Network
+    
+    /// Returns currently active network information.
+    public static func activeNetworkInfo() async -> ActiveNetworkInfo {
+        await ActiveNetworkProvider.activeNetworkInfo()
     }
     
-    /// Returns current cellular subnet mask.
-    public static func cellularSubnetMask() -> String? {
-        cellularInfo().subnetMask
+    /// Returns currently active network type.
+    public static func activeNetworkType() async -> NetworkType {
+        await activeNetworkInfo().networkType
+    }
+    
+    // MARK: - Complete Network Information
+    
+    /// Returns complete network information.
+    public static func completeNetworkInfo() async -> CompleteNetworkInfo {
+        
+        async let wifiInfo = wifiInfo()
+        async let activeNetworkInfo = activeNetworkInfo()
+        
+        let cellularInfo: CellularInfo? =
+        isCellularAvailable()
+        ? CellularInfoProvider.cellularInfo()
+        : nil
+        
+        let interfaceInfo = networkInterfaceInfo()
+        
+        return await CompleteNetworkInfo(
+            wifi: wifiInfo,
+            cellular: cellularInfo,
+            interface: interfaceInfo,
+            activeNetwork: activeNetworkInfo
+        )
     }
 }

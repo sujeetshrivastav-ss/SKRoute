@@ -8,35 +8,35 @@
 
 import Foundation
 
-/// Represents the current cellular network information.
+/// Represents cellular network information.
 public struct CellularInfo: Sendable {
 
-    /// Cellular radio technology.
-    /// Examples:
-    /// - CTRadioAccessTechnologyLTE
-    /// - CTRadioAccessTechnologyNRNSA
-    /// - CTRadioAccessTechnologyNR
-    public let accessTechnology: String?
+    /// Cellular network generation.
+    public let generation: NetworkGeneration
 
-    /// Active cellular service identifier.
+    /// Raw radio technology value.
+    public let radioTechnology: String?
+
+    /// Active data service identifier.
     public let serviceIdentifier: String?
 
-    /// Cellular interface IP address.
+    /// Cellular IP address.
     public let ipAddress: String?
 
-    /// Cellular interface subnet mask.
+    /// Cellular subnet mask.
     public let subnetMask: String?
 
     public init(
-        accessTechnology: String?,
+        generation: NetworkGeneration,
+        radioTechnology: String?,
         serviceIdentifier: String?,
         ipAddress: String?,
         subnetMask: String?
     ) {
-        self.accessTechnology = accessTechnology
+        self.generation = generation
+        self.radioTechnology = radioTechnology
         self.serviceIdentifier = serviceIdentifier
         self.ipAddress = ipAddress
         self.subnetMask = subnetMask
     }
 }
-
