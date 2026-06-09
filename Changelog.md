@@ -9,6 +9,61 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.0] - 2026-06-09
+
+### Added
+
+#### Cellular Information
+
+* CellularInfo model
+* CellularInterfaceInfo model
+* Cellular availability detection
+* Active cellular data detection
+* Cellular IP address retrieval
+* Cellular subnet mask retrieval
+* Cellular network generation support
+
+#### Active Network Detection
+
+* ActiveNetworkInfo model
+* NetworkType model
+* Active network transport detection
+* WiFi detection
+* Cellular detection
+* Ethernet detection
+
+#### Complete Network Information
+
+* CompleteNetworkInfo model
+* Unified network information API
+
+```swift
+await SKRoute.completeNetworkInfo()
+```
+
+### Improved
+
+* Modernized architecture
+* Expanded test coverage
+* Additional documentation
+* Additional examples
+
+### Removed
+
+* Deprecated CoreTelephony APIs
+* Legacy string conversion APIs
+* Unused IPAddressProvider
+
+### Technical Improvements
+
+* Swift 6 concurrency compliance
+* Sendable model support
+* Actor isolation
+* Async/Await APIs
+* Modern string decoding APIs
+
+---
+
 ## [1.3.0] - 2026-06-09
 
 ### Added

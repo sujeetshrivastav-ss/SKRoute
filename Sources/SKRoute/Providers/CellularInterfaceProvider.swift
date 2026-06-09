@@ -5,14 +5,12 @@
 //  Created by Sujeet Shrivastav on 09/06/26.
 //
 
-
 import Foundation
 
 enum CellularInterfaceProvider {
 
     // MARK: - Public
 
-    /// Returns current cellular interface information.
     static func currentInterface() -> CellularInterfaceInfo {
 
         var ipAddress: String?
@@ -23,7 +21,8 @@ enum CellularInterfaceProvider {
         guard getifaddrs(&interfaces) == 0 else {
             return CellularInterfaceInfo(
                 ipAddress: nil,
-                subnetMask: nil
+                subnetMask: nil,
+                isAvailable: false
             )
         }
 
@@ -35,21 +34,18 @@ enum CellularInterfaceProvider {
 
         while let interface = pointer?.pointee {
 
-            guard interface.ifa_addr != nil else {
+            guard let address = interface.ifa_addr else {
                 pointer = interface.ifa_next
                 continue
             }
 
-            let family = interface
-                .ifa_addr
-                .pointee
-                .sa_family
+            let family = address.pointee.sa_family
 
             if family == UInt8(AF_INET) {
 
                 let interfaceName = String(
-                    cString: interface.ifa_name
-                )
+                        validatingCString: interface.ifa_name
+                    ) ?? ""
 
                 if interfaceName.hasPrefix("pdp_ip") {
 
@@ -61,7 +57,11 @@ enum CellularInterfaceProvider {
                         from: interface.ifa_netmask
                     )
 
-                    break
+                    return CellularInterfaceInfo(
+                        ipAddress: ipAddress,
+                        subnetMask: subnetMask,
+                        isAvailable: true
+                    )
                 }
             }
 
@@ -69,14 +69,18 @@ enum CellularInterfaceProvider {
         }
 
         return CellularInterfaceInfo(
-            ipAddress: ipAddress,
-            subnetMask: subnetMask
+            ipAddress: nil,
+            subnetMask: nil,
+            isAvailable: false
         )
+    }
+
+    static func isCellularAvailable() -> Bool {
+        currentInterface().isAvailable
     }
 
     // MARK: - Private
 
-    /// Converts socket address to readable IP string.
     private static func stringValue(
         from address: UnsafeMutablePointer<sockaddr>?
     ) -> String? {
@@ -100,7 +104,15 @@ enum CellularInterfaceProvider {
             NI_NUMERICHOST
         )
 
-        return String(cString: host)
+        let length = host.firstIndex(of: 0) ?? host.count
+
+        let bytes = host
+            .prefix(length)
+            .map { UInt8(bitPattern: $0) }
+
+        return String(
+            decoding: bytes,
+            as: UTF8.self
+        )
     }
 }
-

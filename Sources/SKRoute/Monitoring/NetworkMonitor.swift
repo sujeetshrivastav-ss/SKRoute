@@ -5,7 +5,6 @@
 //  Created by Sujeet Shrivastav on 02/06/26.
 //
 
-
 import Foundation
 import Network
 
@@ -14,6 +13,8 @@ public actor NetworkMonitor {
     private let monitor = NWPathMonitor()
 
     public init() {}
+
+    // MARK: - Public
 
     public func statuses()
     -> AsyncStream<NWPath.Status> {
@@ -24,11 +25,14 @@ public actor NetworkMonitor {
                 continuation.yield(path.status)
             }
 
-            monitor.start(queue: .global())
+            monitor.start(
+                queue: DispatchQueue.global()
+            )
+
+            continuation.onTermination = { _ in
+                self.monitor.cancel()
+            }
         }
     }
-
-    public func stop() {
-        monitor.cancel()
-    }
 }
+
