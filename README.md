@@ -122,6 +122,43 @@ Task {
 }
 ```
 
+## Cellular Information
+
+Retrieve information about the active cellular connection.
+
+### Usage
+
+```swift
+import SKRoute
+
+let cellularInfo = SKRoute.cellularInfo()
+
+print(cellularInfo.accessTechnology ?? "")
+print(cellularInfo.serviceIdentifier ?? "")
+print(cellularInfo.ipAddress ?? "")
+print(cellularInfo.subnetMask ?? "")
+```
+
+### Individual APIs
+
+```swift
+SKRoute.cellularAccessTechnology()
+
+SKRoute.cellularServiceIdentifier()
+
+SKRoute.cellularIPAddress()
+
+SKRoute.cellularSubnetMask()
+```
+
+### Supported Technologies
+
+* LTE
+* 5G NSA
+* 5G SA
+* Dual SIM
+* eSIM
+
 ## Example
 
 ```swift
