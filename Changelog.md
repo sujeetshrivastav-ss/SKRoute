@@ -9,6 +9,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.1] - 2026-07-02
+
+### Fixed
+
+* Lowered `swift-tools-version` from 6.3 to 6.0 so the package can be resolved and installed via Swift Package Manager on Xcode 16+ / Swift 6.0+ toolchains, not only the bleeding-edge 6.3 toolchain.
+
 ## [2.0.0] - 2026-06-09
 
 ### Added
